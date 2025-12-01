@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ExtractedMessageData } from 'src/domain/models/message-data';
 
 @Injectable()
 export class NotionService {
@@ -44,7 +45,7 @@ export class NotionService {
     return this.dataSourceId;
   }
 
-  async createURL(urlValue, nameValue, dataSourceId?: string): Promise<any> {
+  async createURLEntry(messageData: ExtractedMessageData, dataSourceId?: string): Promise<any> {
     dataSourceId = dataSourceId || this.dataSourceId || await this.getDataSourceId()
     const response = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
@@ -54,11 +55,29 @@ export class NotionService {
           data_source_id: dataSourceId  // CHANGED: was database_id
         },
         properties: {
-          Name: {
-            title: [{ text: { content: nameValue } }]
+          // Name: {
+          //   title: [{ text: { content: nameValue } }]
+          // },
+          Timestamp: {
+            date: {
+              start: new Date(Number(messageData.timestamp) * 1000).toISOString()
+            }
           },
           URL: {
-            url: urlValue
+            url: messageData.url
+          },
+          LinkTitle: {
+            title: [{ text: { content: messageData.linkTitle } }]
+          },
+          User: {
+            rich_text: [{ text: { content: messageData.user } }]
+          },
+          MessageContent: {
+            rich_text: [{ text: { content: messageData.messageContent } }]
+          },
+          Permalink: {
+            rich_text: [{ text: { content: messageData.permalink } }]
+
           }
         }
       })
