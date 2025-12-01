@@ -35,6 +35,10 @@ export class EnvVariables {
 
   @IsString()
   @IsOptional()
+  SLACK_PERIGEE_BOT_NAME = 'perigee';
+  
+  @IsString()
+  @IsOptional()
   SLACK_BOT_TOKEN: string;
 
   @IsString()
@@ -50,6 +54,7 @@ export class ConfigValues {
   public readonly port: number;
   public readonly environment: string;
   public readonly loggingLevel: string;
+  public readonly allowedUsers: string[];
   public readonly service: {
     name: string;
     version: string;
@@ -64,12 +69,14 @@ export class ConfigValues {
   
   public readonly slack?: {
     enable: boolean;
+    workspaceDomain: string;
     bot?: {
       botUserId: string;
       token: string;
       appToken: string;
       slackSigningSecret: string;
       useThread: boolean;
+      name: string;
     };
   };
 }
@@ -84,6 +91,7 @@ export const configValues = (): ConfigValues => ({
   port: Number(process.env.PORT),
   environment: process.env.NODE_ENV,
   loggingLevel: process.env.LOGGING_LEVEL,
+  allowedUsers: process.env.SLACK_ALLOWED_USERS?.split(',') || [],
 
   notion: {
     integrationToken: process.env.NOTION_INTEGRATION_TOKEN,
@@ -93,6 +101,7 @@ export const configValues = (): ConfigValues => ({
   
   slack: {
     enable: true,
+    workspaceDomain: process.env.SLACK_WORKSPACE_DOMAIN,
     bot: {
       token: process.env.SLACK_PERIGEE_BOT_TOKEN,
       appToken: process.env.SLACK_PERIGEE_APP_TOKEN,
@@ -100,6 +109,7 @@ export const configValues = (): ConfigValues => ({
       botUserId: process.env.BOT_USER_ID_CLERKBOT,
       useThread: true,
       slackSigningSecret: process.env.SLACK_PERIGEE_SIGNING_SECRET,
+      name: process.env.SLACK_PERIGEE_BOT_NAME,
     },
   },
 });
