@@ -1,7 +1,7 @@
 {
-  "name": "ob-service-ai",
+  "name": "perigee-service-bot",
   "version": "0.0.1",
-  "description": "",
+  "description": "Perigee bot service for Slack",
   "author": "",
   "private": true,
   "license": "UNLICENSED",

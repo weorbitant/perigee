@@ -13,8 +13,6 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   const logger = app.get(Logger);
-  logger.debug('*** logger debug ***');
-  logger.log('*** logger log ***');
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -31,11 +29,10 @@ async function bootstrap() {
   logger.log(`*** console.log ***> LOG_LEVEL: ${configService.get('loggingLevel')} ENV: ${configService.get('environment')}`);
 
   const config = new DocumentBuilder()
-    .setTitle('AI service exemplar')
-    .setDescription('The exemplar API description')
+    .setTitle('Perigee bot service')
+    .setDescription('The Perigee bot service API for multiple uses')
     .setVersion('1.0')
-    .addTag('AI')
-    .addTag('exemplar')
+    .addTag('Perigee')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
