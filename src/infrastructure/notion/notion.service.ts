@@ -55,30 +55,26 @@ export class NotionService {
           data_source_id: dataSourceId  // CHANGED: was database_id
         },
         properties: {
-          // Name: {
-          //   title: [{ text: { content: nameValue } }]
-          // },
-          Timestamp: {
+          "Date message": {
             date: {
               start: new Date(Number(messageData.timestamp) * 1000).toISOString()
             }
           },
-          URL: {
+          "URL info": {
             url: messageData.url
           },
-          LinkTitle: {
+          Extract: {
             title: [{ text: { content: messageData.linkTitle } }]
           },
           User: {
             rich_text: [{ text: { content: messageData.user } }]
           },
-          MessageContent: {
+          Notes: {
             rich_text: [{ text: { content: messageData.messageContent } }]
           },
-          Permalink: {
-            rich_text: [{ text: { content: messageData.permalink } }]
-
-          }
+          "Slack message": {
+            url: messageData.permalink
+          },
         }
       })
     });
