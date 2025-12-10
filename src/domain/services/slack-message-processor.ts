@@ -1,5 +1,21 @@
+import { WebClient } from '@slack/web-api';
 import type { ExtractedMessageData, ParsedLink } from '../models/message-data';
 import type { SlackMessage } from '../models/incoming-message';
+
+
+export const getUsernameFromId = async (client: WebClient, userId) => {
+  const result = await client.users.info({ user: userId });
+  
+  const displayName = result.user?.profile?.display_name_normalized 
+    || result.user?.profile?.display_name
+    || result.user?.real_name
+    || result.user?.name;
+  
+  return displayName 
+    ? `@${displayName}`
+    : Promise.reject(new Error(`User ${userId} not found or has no display name`));
+};
+
 
 const extractLinks = (text: string): ParsedLink[] => {
   const linkPattern = /<((?:https?:\/\/|mailto:)[^|>]+)(?:\|([^>]+))?>/g;
@@ -34,11 +50,11 @@ const buildPermalink = (teamId: string, channelId: string, ts: string): string =
   return `https://${domain}.slack.com/archives/${channelId}/p${tsWithoutDot}`;
 };
 
-export const extractMessageData = (
+export const extractMessageData = (client: WebClient) => async (
   message: SlackMessage,
   workspaceDomain?: string,
   channelId?: string,
-): ExtractedMessageData => {
+): Promise<ExtractedMessageData> => {
   const links = extractLinks(message.text);
   const firstLink = links[0] || null;
   
@@ -53,7 +69,7 @@ export const extractMessageData = (
     timestamp: message.ts,
     url: firstLink?.url || null,
     linkTitle: firstLink?.title || null,
-    user: message.user,
+    user: await getUsernameFromId(client, message.user),
     messageContent: stripFormatting(message.text),
     permalink,
   };

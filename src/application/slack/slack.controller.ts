@@ -1,8 +1,8 @@
-import { v4 as uuid } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import { Controller, Logger, OnModuleInit } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { App } from '@slack/bolt';
+import { App, AppMentionEvent, SayFn } from '@slack/bolt';
+import { WebClient } from '@slack/web-api';
 import { NotionService } from 'src/infrastructure/notion/notion.service';
 import { ExtractedMessageData } from 'src/domain/models/message-data';
 import { extractMessageData } from 'src/domain/services/slack-message-processor';
@@ -37,7 +37,7 @@ export class SlackController implements OnModuleInit {
       signingSecret: slackSigningSecret,
     });
 
-    this.boltApp.event('app_mention', async ({ event, say, client }) => {
+    this.boltApp.event('app_mention', async ({ event, say, client }: { event: AppMentionEvent, say: SayFn, client: WebClient }) => {
       try {
         this.logger.debug('app_mention', JSON.stringify(event));
         if (!event.thread_ts) {
@@ -73,7 +73,8 @@ export class SlackController implements OnModuleInit {
         );
 
         // Prepare data to send to service
-        const extractedMessageData: ExtractedMessageData = extractMessageData(
+        const messageDataExtractor = extractMessageData(client);
+        const extractedMessageData: ExtractedMessageData = await messageDataExtractor(
           mainMessage,
           this.configService.get('slack.workspaceDomain'),
           event.channel
