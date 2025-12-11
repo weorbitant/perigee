@@ -68,7 +68,7 @@ export const extractMessageData = (client: WebClient) => async (
   return {
     timestamp: message.ts,
     url: firstLink?.url || null,
-    linkTitle: firstLink?.title || null,
+    linkTitle: firstLink?.title || firstLink?.url || null,
     user: await getUsernameFromId(client, message.user),
     messageContent: stripFormatting(message.text),
     permalink,
